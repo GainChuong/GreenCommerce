@@ -2,6 +2,8 @@
 
 import React, { useState, useEffect, use, useMemo } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/context/AuthContext";
 
 interface Review {
   id: number;
@@ -173,6 +175,29 @@ export default function ProductDetail({ params }: PageProps) {
   
   const product = PRODUCTS_DB[productId] || PRODUCTS_DB["1"]; // Default to '1' if not found
 
+  const router = useRouter();
+  const { isLoggedIn, addToCart } = useAuth();
+  const [cartNotification, setCartNotification] = useState<string | null>(null);
+
+  const handleAddToCart = () => {
+    if (!isLoggedIn) {
+      router.push(`/auth/login?redirect=/shop/${productId}`);
+      return;
+    }
+    // Parse price string to number
+    const priceNum = parseInt(product.price.replace(/[^0-9]/g, ""), 10);
+    addToCart({
+      productId: product.id,
+      name: product.name,
+      price: priceNum,
+      priceStr: product.price,
+      image: product.image,
+      ecoScore: product.ecoScore,
+    });
+    setCartNotification(`✅ Đã thêm "${product.name}" vào giỏ hàng!`);
+    setTimeout(() => setCartNotification(null), 3500);
+  };
+
   // Review states
   const [reviews, setReviews] = useState<Review[]>([]);
   const [newReviewText, setNewReviewText] = useState("");
@@ -316,6 +341,30 @@ export default function ProductDetail({ params }: PageProps) {
 
   return (
     <div style={{ padding: "3rem 0" }}>
+      {/* CART ADDED TOAST */}
+      {cartNotification && (
+        <div style={{
+          position: "fixed",
+          bottom: "20px",
+          right: "20px",
+          backgroundColor: "var(--primary)",
+          color: "white",
+          padding: "1rem 2rem",
+          borderRadius: "15px",
+          boxShadow: "0 10px 30px var(--shadow-lg)",
+          zIndex: 9999,
+          display: "flex",
+          alignItems: "center",
+          gap: "0.75rem",
+          fontWeight: "600",
+          fontSize: "0.9rem",
+          animation: "fadeInUp 0.3s ease"
+        }}>
+          <i className="fa-solid fa-bag-shopping"></i>
+          {cartNotification}
+          <Link href="/cart" style={{ color: "var(--accent)", fontWeight: "700", marginLeft: "0.5rem" }}>Xem giỏ →</Link>
+        </div>
+      )}
       <div className="container">
         
         {/* Breadcrumb */}
@@ -433,11 +482,23 @@ export default function ProductDetail({ params }: PageProps) {
             </div>
 
             <div style={{ display: "flex", gap: "1rem" }}>
-              <button className="btn btn-primary" style={{ flexGrow: 1, padding: "1rem", borderRadius: "12px", fontSize: "1rem" }}>
+              <button onClick={handleAddToCart} className="btn btn-outline" style={{ flexGrow: 1, padding: "1rem", borderRadius: "12px", fontSize: "1rem", borderColor: "var(--primary)", color: "var(--primary)" }}>
+                <i className="fa-solid fa-bag-shopping" style={{ marginRight: "0.35rem" }}></i>
                 Thêm vào Giỏ Hàng
               </button>
-              <button className="btn btn-outline" style={{ padding: "1rem 1.5rem", borderRadius: "12px" }}>
-                <i className="fa-regular fa-heart"></i>
+              <button
+                onClick={() => {
+                  if (!isLoggedIn) {
+                    router.push(`/auth/login?redirect=/checkout?buyNow=${productId}`);
+                    return;
+                  }
+                  router.push(`/checkout?buyNow=${productId}`);
+                }}
+                className="btn btn-primary"
+                style={{ flexGrow: 1, padding: "1rem", borderRadius: "12px", fontSize: "1rem" }}
+              >
+                <i className="fa-solid fa-bolt" style={{ marginRight: "0.35rem" }}></i>
+                Mua Ngay
               </button>
             </div>
           </div>

@@ -349,3 +349,27 @@ button, input, textarea, select {
   transform: scale(1.05);
 }
 
+/* Profile Dropdown */
+.dropdown-link:hover {
+  background-color: var(--background) !important;
+}
+
+.profile-avatar-btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 0 3px var(--primary-light) !important;
+}
+
+/* Profile dropdown arrow */
+.profile-dropdown::before {
+  content: '';
+  position: absolute;
+  top: -8px;
+  right: 14px;
+  width: 14px;
+  height: 14px;
+  background-color: var(--card);
+  border-left: 1px solid var(--border);
+  border-top: 1px solid var(--border);
+  transform: rotate(45deg);
+}
+
