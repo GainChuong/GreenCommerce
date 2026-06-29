@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import { AuthProvider } from "@/context/AuthContext";
 
 export const metadata: Metadata = {
   title: "ReFashion - Mua Sắm Xanh & Phân Tích Cảm Xúc Khách Hàng",
@@ -31,11 +32,13 @@ export default function RootLayout({
         />
       </head>
       <body>
-        <Navbar />
-        <main style={{ minHeight: "calc(100vh - 70px)", display: "flex", flexDirection: "column" }}>
-          {children}
-        </main>
-        <Footer />
+        <AuthProvider>
+          <Navbar />
+          <main style={{ minHeight: "calc(100vh - 70px)", display: "flex", flexDirection: "column" }}>
+            {children}
+          </main>
+          <Footer />
+        </AuthProvider>
       </body>
     </html>
   );

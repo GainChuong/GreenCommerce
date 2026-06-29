@@ -173,22 +173,54 @@ export default function Shop() {
             
             {/* Search Filter */}
             <div style={{ marginBottom: "1.5rem" }}>
-              <h3 style={{ fontSize: "1rem", fontWeight: "700", marginBottom: "0.75rem", color: "var(--primary)" }}>Tìm kiếm</h3>
-              <input 
-                type="text" 
-                placeholder="Tên sản phẩm, chất liệu..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                style={{
-                  width: "100%",
-                  padding: "0.6rem 1rem",
-                  borderRadius: "10px",
-                  border: "1px solid var(--border)",
-                  backgroundColor: "var(--background)",
-                  color: "var(--foreground)",
-                  fontSize: "0.9rem"
-                }}
-              />
+              <h3 style={{ fontSize: "1rem", fontWeight: "700", marginBottom: "0.75rem", color: "var(--primary)" }}>
+                <i className="fa-solid fa-magnifying-glass" style={{ marginRight: "0.4rem" }}></i>
+                Tìm kiếm
+              </h3>
+              <div style={{ position: "relative" }}>
+                <i className="fa-solid fa-magnifying-glass" style={{
+                  position: "absolute", left: "0.85rem", top: "50%", transform: "translateY(-50%)",
+                  color: searchQuery ? "var(--primary)" : "var(--text-muted)", fontSize: "0.85rem",
+                  transition: "color 0.2s"
+                }}></i>
+                <input
+                  type="text"
+                  placeholder="Tên sản phẩm, chất liệu..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  style={{
+                    width: "100%",
+                    padding: "0.6rem 2.25rem 0.6rem 2.25rem",
+                    borderRadius: "10px",
+                    border: `1.5px solid ${searchQuery ? "var(--primary)" : "var(--border)"}`,
+                    backgroundColor: "var(--background)",
+                    color: "var(--foreground)",
+                    fontSize: "0.9rem",
+                    outline: "none",
+                    transition: "border-color 0.2s",
+                    boxSizing: "border-box"
+                  }}
+                />
+                {searchQuery && (
+                  <button
+                    type="button"
+                    onClick={() => setSearchQuery("")}
+                    style={{
+                      position: "absolute", right: "0.7rem", top: "50%", transform: "translateY(-50%)",
+                      background: "transparent", border: 0, color: "var(--text-muted)",
+                      cursor: "pointer", fontSize: "0.9rem", lineHeight: 1
+                    }}
+                    title="Xóa tìm kiếm"
+                  >
+                    <i className="fa-solid fa-xmark"></i>
+                  </button>
+                )}
+              </div>
+              {searchQuery && (
+                <p style={{ fontSize: "0.75rem", color: "var(--primary)", marginTop: "0.35rem", fontWeight: 600 }}>
+                  Đang tìm: &quot;{searchQuery}&quot;
+                </p>
+              )}
             </div>
 
             {/* Category Filter */}

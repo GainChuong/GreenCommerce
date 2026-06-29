@@ -1,6 +1,8 @@
 "use client";
 
 import React, { useState } from "react";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/context/AuthContext";
 
 interface RewardItem {
   id: number;
@@ -47,8 +49,11 @@ const REWARDS_DB: RewardItem[] = [
 ];
 
 export default function Community() {
-  // Local state for coin balance
-  const [balance, setBalance] = useState(150);
+  const router = useRouter();
+  const { user, isLoggedIn, addDonation, spendGreenCoin, redeemVoucher } = useAuth();
+
+  // Use user's greenCoin from context
+  const balance = user?.greenCoin ?? 0;
 
   // Donation form states
   const [clothingType, setClothingType] = useState("shirt");
@@ -63,16 +68,26 @@ export default function Community() {
   // Handle Donation
   const handleDonationSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!isLoggedIn) {
+      router.push("/auth/login?redirect=/community");
+      return;
+    }
+
     if (pickupAddress.trim() === "") return;
 
-    // Simulate approval and reward
-    const rewardedCoins = quantity * 15; // 15 coins per cloth item
-    setBalance(prev => prev + rewardedCoins);
+    // Use auth context donation method
+    const rewardedCoins = addDonation({
+      clothingType,
+      quantity,
+      condition,
+      address: pickupAddress,
+    });
+
     setDonationSuccess(true);
     setPickupAddress("");
     setQuantity(1);
 
-    // Alert notification
     showNotification(`🍀 Quyên góp thành công! Bạn được cộng +${rewardedCoins} GreenCoin.`);
 
     setTimeout(() => {
@@ -82,12 +97,34 @@ export default function Community() {
 
   // Handle Redeem
   const handleRedeem = (item: RewardItem) => {
-    if (balance < item.cost) {
+    if (!isLoggedIn) {
+      router.push("/auth/login?redirect=/community");
+      return;
+    }
+
+    // For discount-type rewards, create a real voucher
+    if (item.category === "discount") {
+      // Extract discount percentage from name (e.g. "Voucher Giảm Giá 20%")
+      const discountMatch = item.name.match(/(\d+)%/);
+      const discount = discountMatch ? parseInt(discountMatch[1]) : 20;
+
+      const voucher = redeemVoucher(item.cost, discount, item.name);
+      if (!voucher) {
+        showNotification(`❌ Bạn không đủ GreenCoin. Cần thêm ${item.cost - balance} GreenCoin.`);
+        return;
+      }
+
+      showNotification(`🎟️ Đổi voucher thành công! Mã của bạn: ${voucher.code} (Giảm ${discount}%, HSD: ${voucher.expiresAt}). Áp dụng khi thanh toán!`);
+      return;
+    }
+
+    // For non-discount rewards, just spend coins
+    const success = spendGreenCoin(item.cost);
+    if (!success) {
       showNotification(`❌ Bạn không đủ GreenCoin. Cần thêm ${item.cost - balance} GreenCoin.`);
       return;
     }
 
-    setBalance(prev => prev - item.cost);
     showNotification(`🎉 Đổi quà thành công! Bạn đã nhận: "${item.name}".`);
   };
 
@@ -177,8 +214,18 @@ export default function Community() {
                 Ví GreenCoin Của Bạn
               </span>
               <h2 style={{ fontSize: "3.5rem", fontWeight: "900", margin: "0.5rem 0", display: "flex", alignItems: "center", gap: "0.5rem" }}>
-                {balance} <i className="fa-solid fa-leaf" style={{ fontSize: "2.5rem", color: "var(--accent)" }}></i>
+                {isLoggedIn ? balance : "—"} <i className="fa-solid fa-leaf" style={{ fontSize: "2.5rem", color: "var(--accent)" }}></i>
               </h2>
+              {!isLoggedIn && (
+                <p style={{ fontSize: "0.85rem", opacity: 0.85 }}>
+                  <a
+                    href="/auth/login?redirect=/community"
+                    style={{ color: "var(--accent)", fontWeight: "700", textDecoration: "underline" }}
+                  >
+                    Đăng nhập
+                  </a>{" "}để xem số dư GreenCoin
+                </p>
+              )}
             </div>
 
             <div style={{ borderTop: "1px solid rgba(255,255,255,0.15)", paddingTop: "1.5rem" }}>
@@ -204,30 +251,50 @@ export default function Community() {
             
             <div style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
               {/* Campaign 1 */}
-              <div style={{ display: "flex", gap: "1rem", borderBottom: "1px solid var(--border)", paddingBottom: "1rem" }}>
+              <div style={{ display: "flex", gap: "1rem", borderBottom: "1px solid var(--border)", paddingBottom: "1rem", alignItems: "flex-start" }}>
                 <div style={{ width: "80px", height: "80px", borderRadius: "12px", overflow: "hidden", flexShrink: 0 }}>
                   <img src="https://images.unsplash.com/photo-1618477388954-7852f32655ec?q=80&w=150" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
                 </div>
-                <div>
+                <div style={{ flex: 1 }}>
                   <span className="badge badge-primary" style={{ fontSize: "0.65rem", marginBottom: "0.25rem" }}>Hoạt động tháng 6</span>
                   <h4 style={{ fontWeight: "700", fontSize: "0.95rem" }}>Ngày hội Dọn Rác & Làm Sạch Bờ Biển Vũng Tàu</h4>
-                  <p style={{ fontSize: "0.85rem", color: "var(--text-muted)", marginTop: "0.25rem" }}>
+                  <p style={{ fontSize: "0.85rem", color: "var(--text-muted)", marginTop: "0.25rem", marginBottom: "0.5rem" }}>
                     Tham gia cùng hơn 200 tình nguyện viên nhặt rác nhựa, bảo vệ đại dương. Nhận ngay 100 GreenCoin khi đăng ký tham dự.
                   </p>
+                  <a
+                    href="https://tnmtvungtau.vn"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="btn btn-outline"
+                    style={{ fontSize: "0.75rem", padding: "0.3rem 0.85rem", borderRadius: "8px", display: "inline-flex", alignItems: "center", gap: "0.35rem" }}
+                  >
+                    <i className="fa-solid fa-arrow-up-right-from-square" style={{ fontSize: "0.7rem" }}></i>
+                    Xem Chi Tiết
+                  </a>
                 </div>
               </div>
 
               {/* Campaign 2 */}
-              <div style={{ display: "flex", gap: "1rem" }}>
+              <div style={{ display: "flex", gap: "1rem", alignItems: "flex-start" }}>
                 <div style={{ width: "80px", height: "80px", borderRadius: "12px", overflow: "hidden", flexShrink: 0 }}>
                   <img src="https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?q=80&w=150" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
                 </div>
-                <div>
+                <div style={{ flex: 1 }}>
                   <span className="badge badge-accent" style={{ fontSize: "0.65rem", marginBottom: "0.25rem" }}>Dự án rừng xanh</span>
                   <h4 style={{ fontWeight: "700", fontSize: "0.95rem" }}>Quyên Góp Phủ Xanh 10 Hecta Rừng Ngập Mặn</h4>
-                  <p style={{ fontSize: "0.85rem", color: "var(--text-muted)", marginTop: "0.25rem" }}>
+                  <p style={{ fontSize: "0.85rem", color: "var(--text-muted)", marginTop: "0.25rem", marginBottom: "0.5rem" }}>
                     Chúng tôi đang phối hợp trồng rừng chống ngập. Nhấn đổi 50 GreenCoin để thay thế 1 cây con trồng thật tế.
                   </p>
+                  <a
+                    href="https://www.thiennhien.net"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="btn btn-outline"
+                    style={{ fontSize: "0.75rem", padding: "0.3rem 0.85rem", borderRadius: "8px", display: "inline-flex", alignItems: "center", gap: "0.35rem" }}
+                  >
+                    <i className="fa-solid fa-arrow-up-right-from-square" style={{ fontSize: "0.7rem" }}></i>
+                    Xem Chi Tiết
+                  </a>
                 </div>
               </div>
             </div>
@@ -256,6 +323,26 @@ export default function Community() {
             <p style={{ fontSize: "0.85rem", color: "var(--text-muted)", marginBottom: "1.5rem", lineHeight: "1.5" }}>
               Quần áo không dùng nữa của bạn sẽ được chúng tôi phân loại để làm từ thiện hoặc tái sinh kéo sợi làm vải mới.
             </p>
+
+            {/* Donation success alert */}
+            {donationSuccess && (
+              <div style={{
+                backgroundColor: "var(--sentiment-pos-light)",
+                border: "1px solid var(--sentiment-pos)",
+                borderRadius: "12px",
+                padding: "0.85rem 1rem",
+                marginBottom: "1rem",
+                display: "flex",
+                alignItems: "center",
+                gap: "0.5rem",
+                fontSize: "0.85rem",
+                color: "var(--sentiment-pos)",
+                fontWeight: "600"
+              }}>
+                <i className="fa-solid fa-circle-check"></i>
+                Quyên góp thành công! GreenCoin đã được cộng vào ví.
+              </div>
+            )}
 
             <form onSubmit={handleDonationSubmit}>
               <div style={{ marginBottom: "1rem" }}>
@@ -344,7 +431,7 @@ export default function Community() {
               </div>
 
               <button className="btn btn-primary" type="submit" style={{ width: "100%", borderRadius: "10px" }}>
-                Đăng Ký Quyên Góp Ngay
+                {isLoggedIn ? "Đăng Ký Quyên Góp Ngay" : "Đăng Nhập Để Quyên Góp"}
               </button>
             </form>
           </div>
@@ -403,12 +490,12 @@ export default function Community() {
                           padding: "0.4rem 0.85rem", 
                           fontSize: "0.8rem", 
                           borderRadius: "8px", 
-                          backgroundColor: balance >= item.cost ? "var(--primary-light)" : "transparent",
-                          color: balance >= item.cost ? "var(--primary)" : "var(--foreground)",
-                          borderColor: balance >= item.cost ? "var(--primary)" : "var(--border)"
+                          backgroundColor: isLoggedIn && balance >= item.cost ? "var(--primary-light)" : "transparent",
+                          color: isLoggedIn && balance >= item.cost ? "var(--primary)" : "var(--foreground)",
+                          borderColor: isLoggedIn && balance >= item.cost ? "var(--primary)" : "var(--border)"
                         }}
                       >
-                        Đổi Quà
+                        {isLoggedIn ? "Đổi Quà" : "Đăng Nhập"}
                       </button>
                     </div>
                   </div>
