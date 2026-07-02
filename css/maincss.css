@@ -1,28 +1,32 @@
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Space+Mono:wght@400;700&display=swap');
 
 :root {
-  --background: hsl(30, 20%, 98%);
-  --foreground: hsl(210, 15%, 15%);
-  --primary: hsl(142, 60%, 22%);
-  --primary-hover: hsl(142, 65%, 18%);
-  --primary-light: hsl(142, 50%, 93%);
-  --accent: hsl(32, 75%, 45%);
-  --accent-hover: hsl(32, 80%, 40%);
-  --accent-light: hsl(32, 60%, 93%);
-  --card: hsl(0, 0%, 100%);
-  --border: hsl(30, 10%, 88%);
-  --text-muted: hsl(210, 10%, 45%);
-  --shadow: rgba(43, 39, 36, 0.06);
-  --shadow-lg: rgba(43, 39, 36, 0.12);
+  --background: #F8F6F1;
+  --secondary: #EEE8DB;
+  --primary: #5B7453;
+  --primary-hover: #395144;
+  --primary-light: #A7B89A;
+  --accent: #A6855B;
+  --accent-hover: #B99873;
+  --accent-light: #EEE8DB;
+  --earth: #708C69;
+  --clay: #A6855B;
+  --brown: #B99873;
+  --foreground: #2B2B2B;
+  --card: #FFFFFF;
+  --border: #E7E2D8;
+  --text-muted: #72766C;
+  --shadow: rgba(43, 43, 43, 0.04);
+  --shadow-lg: rgba(43, 43, 43, 0.08);
   --font-sans: 'Outfit', sans-serif;
   --font-serif: 'Playfair Display', serif;
   --font-mono: 'Space Mono', monospace;
-  --sentiment-pos: hsl(142, 72%, 29%);
-  --sentiment-pos-light: hsl(142, 60%, 94%);
-  --sentiment-neu: hsl(38, 92%, 50%);
-  --sentiment-neu-light: hsl(38, 90%, 94%);
-  --sentiment-neg: hsl(0, 72%, 51%);
-  --sentiment-neg-light: hsl(0, 80%, 94%);
+  --sentiment-pos: #5B7453;
+  --sentiment-pos-light: #EEE8DB;
+  --sentiment-neu: #B99873;
+  --sentiment-neu-light: #F8F6F1;
+  --sentiment-neg: #A6855B;
+  --sentiment-neg-light: #EEE8DB;
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -114,17 +118,18 @@ button, input, textarea, select { font-family: inherit; outline: none; }
 
 .btn {
   display: inline-flex; align-items: center; justify-content: center;
-  gap: 0.5rem; padding: 0.8rem 1.8rem; border-radius: 0;
-  font-weight: 500; font-size: 0.85rem; cursor: pointer;
-  text-transform: uppercase; letter-spacing: 0.05em;
-  transition: all 0.3s ease; border: 1px solid transparent;
+  gap: 0.5rem; padding: 0.65rem 1.5rem; border-radius: 50px;
+  font-weight: 600; font-size: 0.9rem; cursor: pointer;
+  transition: all 0.2s ease; border: 1px solid transparent;
 }
-.btn-primary { background-color: var(--primary); color: white; border-color: var(--primary); }
-.btn-primary:hover { background-color: transparent; color: var(--primary); }
-.btn-outline { background-color: transparent; color: var(--foreground); border-color: var(--border); }
-.btn-outline:hover { background-color: var(--primary); color: white; border-color: var(--primary); }
-.btn-accent { background-color: var(--accent); color: white; border-color: var(--accent); }
-.btn-accent:hover { background-color: transparent; color: var(--accent); }
+.btn-primary { background-color: var(--primary); color: white; }
+.btn-primary:hover { background-color: var(--primary-hover); transform: translateY(-1px); }
+.btn-outline {
+  background-color: transparent; color: var(--foreground); border-color: var(--border);
+}
+.btn-outline:hover { background-color: var(--border); transform: translateY(-1px); }
+.btn-accent { background-color: var(--accent); color: white; }
+.btn-accent:hover { background-color: var(--accent-hover); transform: translateY(-1px); }
 
 .footer-main {
   background-color: hsl(210, 15%, 12%); color: hsl(30, 20%, 90%);
