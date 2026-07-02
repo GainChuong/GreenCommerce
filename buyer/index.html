@@ -73,6 +73,36 @@
       </div>
     </section>
 
+    <!-- SUSTAINABILITY EXHIBITION CAROUSEL -->
+    <section class="gallery-section">
+      <div class="gallery-carousel" id="sustainabilityCarousel">
+        <div class="carousel-slide active" style="background-image: url('https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?q=80&w=1920');">
+          <div class="slide-content">
+            <h3>Bảo Vệ Môi Trường Trái Đất</h3>
+            <p>Chúng ta chỉ có một Trái Đất. Mỗi quyết định mua sắm bền vững là một hạt giống xanh gieo vào tương lai.</p>
+          </div>
+        </div>
+        <div class="carousel-slide" style="background-image: url('https://images.unsplash.com/photo-1611288875780-c11d99616335?q=80&w=1920');">
+          <div class="slide-content">
+            <h3>Sợi Hữu Cơ & Tự Nhiên</h3>
+            <p>100% vật liệu được kiểm duyệt nghiêm ngặt, đảm bảo không hóa chất độc hại và hoàn toàn thân thiện với hệ sinh thái.</p>
+          </div>
+        </div>
+        <div class="carousel-slide" style="background-image: url('https://images.unsplash.com/photo-1581092160562-40aa08e78837?q=80&w=1920');">
+          <div class="slide-content">
+            <h3>Quy Trình Xanh Tối Ưu</h3>
+            <p>Giảm thiểu tối đa lượng nước và năng lượng tiêu thụ trong quá trình tái chế và chế tác thủ công.</p>
+          </div>
+        </div>
+        
+        <div class="carousel-indicators">
+          <span class="indicator active" onclick="goToSlide(0)"></span>
+          <span class="indicator" onclick="goToSlide(1)"></span>
+          <span class="indicator" onclick="goToSlide(2)"></span>
+        </div>
+      </div>
+    </section>
+
     <section class="featured-section" style="background-color:var(--background)">
       <div class="container">
         <div class="featured-header">
@@ -104,5 +134,29 @@
 
   <script src="../js/mainjs.js"></script>
   <script src="../js/buyer.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Carousel Logic
+      let currentSlide = 0;
+      const slides = document.querySelectorAll('.carousel-slide');
+      const indicators = document.querySelectorAll('.indicator');
+      
+      window.goToSlide = function(index) {
+        if (!slides.length) return;
+        slides[currentSlide].classList.remove('active');
+        indicators[currentSlide].classList.remove('active');
+        currentSlide = index;
+        slides[currentSlide].classList.add('active');
+        indicators[currentSlide].classList.add('active');
+      };
+
+      if (slides.length > 0) {
+        setInterval(() => {
+          let next = (currentSlide + 1) % slides.length;
+          goToSlide(next);
+        }, 5000);
+      }
+    });
+  </script>
 </body>
 </html>
