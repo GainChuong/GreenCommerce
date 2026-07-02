@@ -16,14 +16,23 @@
 
   <main>
     <section class="hero-section">
-      <div class="hero-overlay"></div>
-      <div class="container hero-content">
+      <div class="hero-carousel">
+        <div class="hero-slide active" style="background-image: url('https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?q=80&w=1920');"></div>
+        <div class="hero-slide" style="background-image: url('https://images.unsplash.com/photo-1611288875780-c11d99616335?q=80&w=1920');"></div>
+        <div class="hero-slide" style="background-image: url('https://images.unsplash.com/photo-1581092160562-40aa08e78837?q=80&w=1920');"></div>
+      </div>
+      <div class="container hero-content" style="position: relative; z-index: 2;">
         <h1 class="hero-title">Wear Better.<br />Waste Less.</h1>
         <p class="hero-subtitle">Sustainable fashion platform for buying, donating and transforming pre-loved clothes. Join the circular fashion revolution today.</p>
         <div class="hero-actions">
           <a href="shop.html" class="btn btn-primary" style="padding:0.9rem 2.5rem;border-radius:30px;font-size:1.05rem;font-weight:700"><i class="fa-solid fa-bag-shopping" style="margin-right:0.35rem"></i>Khám Phá Ngay</a>
           <a href="about.html" class="btn btn-outline" style="padding:0.9rem 2.5rem;border-radius:30px;font-size:1.05rem;border-color:rgba(255,255,255,0.5);color:white">Tìm Hiểu Thêm</a>
         </div>
+      </div>
+      <div class="carousel-indicators" style="position: absolute; bottom: 2rem; left: 0; width: 100%; display: flex; justify-content: center; gap: 0.75rem; z-index: 3;">
+        <span class="indicator active" onclick="goToSlide(0)"></span>
+        <span class="indicator" onclick="goToSlide(1)"></span>
+        <span class="indicator" onclick="goToSlide(2)"></span>
       </div>
     </section>
 
@@ -73,36 +82,6 @@
       </div>
     </section>
 
-    <!-- SUSTAINABILITY EXHIBITION CAROUSEL -->
-    <section class="gallery-section">
-      <div class="gallery-carousel" id="sustainabilityCarousel">
-        <div class="carousel-slide active" style="background-image: url('https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?q=80&w=1920');">
-          <div class="slide-content">
-            <h3>Bảo Vệ Môi Trường Trái Đất</h3>
-            <p>Chúng ta chỉ có một Trái Đất. Mỗi quyết định mua sắm bền vững là một hạt giống xanh gieo vào tương lai.</p>
-          </div>
-        </div>
-        <div class="carousel-slide" style="background-image: url('https://images.unsplash.com/photo-1611288875780-c11d99616335?q=80&w=1920');">
-          <div class="slide-content">
-            <h3>Sợi Hữu Cơ & Tự Nhiên</h3>
-            <p>100% vật liệu được kiểm duyệt nghiêm ngặt, đảm bảo không hóa chất độc hại và hoàn toàn thân thiện với hệ sinh thái.</p>
-          </div>
-        </div>
-        <div class="carousel-slide" style="background-image: url('https://images.unsplash.com/photo-1581092160562-40aa08e78837?q=80&w=1920');">
-          <div class="slide-content">
-            <h3>Quy Trình Xanh Tối Ưu</h3>
-            <p>Giảm thiểu tối đa lượng nước và năng lượng tiêu thụ trong quá trình tái chế và chế tác thủ công.</p>
-          </div>
-        </div>
-        
-        <div class="carousel-indicators">
-          <span class="indicator active" onclick="goToSlide(0)"></span>
-          <span class="indicator" onclick="goToSlide(1)"></span>
-          <span class="indicator" onclick="goToSlide(2)"></span>
-        </div>
-      </div>
-    </section>
-
     <section class="featured-section" style="background-color:var(--background)">
       <div class="container">
         <div class="featured-header">
@@ -138,7 +117,7 @@
     document.addEventListener('DOMContentLoaded', function() {
       // Carousel Logic
       let currentSlide = 0;
-      const slides = document.querySelectorAll('.carousel-slide');
+      const slides = document.querySelectorAll('.hero-slide');
       const indicators = document.querySelectorAll('.indicator');
       
       window.goToSlide = function(index) {
